@@ -1,0 +1,26 @@
+2017/06/07 14:35:06 [INFO] godns 0.1.2 start
+2017/06/07 14:35:06 [INFO] Start udp listener on 0.0.0.0:53
+2017/06/07 14:35:06 [INFO] Start tcp listener on 0.0.0.0:53
+2017/06/07 14:35:06 [DEBUG] update hosts records from /etc/hosts
+2017/06/07 14:35:06 [DEBUG] Update hosts records from redis
+2017/06/07 14:35:11 [DEBUG] update hosts records from /etc/hosts
+2017/06/07 14:35:11 [DEBUG] Update hosts records from redis
+2017/06/07 14:35:17 [DEBUG] update hosts records from /etc/hosts
+2017/06/07 14:35:17 [DEBUG] Update hosts records from redis
+2017/06/07 14:35:18 [INFO] 127.0.0.1 lookup　baidu.com IN A
+2017/06/07 14:35:18 [DEBUG] baidu.com didn't found in hosts file
+2017/06/07 14:35:18 [DEBUG] baidu.com IN A didn't hit cache
+2017/06/07 14:35:18 [DEBUG] baidu.com resolv on 114.114.114.114:53 (udp) ttl: 27692400
+2017/06/07 14:35:18 [DEBUG] Insert baidu.com IN A into cache
+2017/06/07 14:35:21 [DEBUG] update hosts records from /etc/hosts
+2017/06/07 14:35:21 [DEBUG] Update hosts records from redis
+2017/06/07 14:35:26 [DEBUG] update hosts records from /etc/hosts
+2017/06/07 14:35:26 [DEBUG] Update hosts records from redis
+2017/06/07 14:35:31 [DEBUG] update hosts records from /etc/hosts
+2017/06/07 14:35:31 [DEBUG] Update hosts records from redis
+2017/06/07 14:35:36 [DEBUG] update hosts records from /etc/hosts
+2017/06/07 14:35:36 [DEBUG] Update hosts records from redis
+2017/06/07 14:35:41 [DEBUG] update hosts records from /etc/hosts
+2017/06/07 14:35:41 [DEBUG] Update hosts records from redis
+2017/06/07 14:35:46 [DEBUG] update hosts records from /etc/hosts
+2017/06/07 14:35:46 [DEBUG] Update hosts records from redis
