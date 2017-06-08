@@ -10,8 +10,12 @@
 
     git clone https://github.com/hiccupzhu/godns.git
 
+下载go编译环境[http://www.golangtc.com/download](http://www.golangtc.com/download) 解压至 /opt/local/go/
+
 ## 编译运行
 
-    cd <anywhere>/godns/src/godns
+    cd <anywhere>/godns
+    source ./env.sh
+    cd src/godns
     go build -o godns
     ./godns -c godns.conf
