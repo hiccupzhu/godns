@@ -7,11 +7,6 @@ import (
 	"github.com/miekg/dns"
 )
 
-const (
-	notIPQuery = 0
-	_IP4Query  = 4
-	_IP6Query  = 6
-)
 
 type Question struct {
 	qname  string
@@ -101,7 +96,9 @@ func (h *GODNSHandler) do(Net string, w dns.ResponseWriter, req *dns.Msg) {
 	}
 	logger.Info("%s lookup　%s", remote, Q.String())
 
+    
 	IPQuery := h.isIPQuery(q)
+	logger.Info("#### %+v, IPQuery:%d", q, IPQuery)
 
 	// Query hosts
 	if settings.Hosts.Enable && IPQuery > 0 {
@@ -110,18 +107,30 @@ func (h *GODNSHandler) do(Net string, w dns.ResponseWriter, req *dns.Msg) {
 			m.SetReply(req)
 
 			switch IPQuery {
-			case _IP4Query:
-				rr_header := dns.RR_Header{
-					Name:   q.Name,
-					Rrtype: dns.TypeA,
-					Class:  dns.ClassINET,
-					Ttl:    settings.Hosts.TTL,
-				}
+			case dns.TypeA:
+				
 				for _, ip := range ips {
+				    ip_s := ip.String()
+				    is_ip := net.ParseIP(ip_s) != nil
+				    logger.Info("#### %s isIP:%t", ip_s, is_ip)
+				    rrttype := dns.TypeNone
+				    if is_ip {
+				        rrttype = dns.TypeA
+				    } else {
+				        rrttype = dns.TypeCNAME
+				    }
+				    
+				    rr_header := dns.RR_Header{
+    					Name:   q.Name,
+    					Rrtype: rrttype,
+    					Class:  dns.ClassINET,
+    					Ttl:    settings.Hosts.TTL,
+    				}
+				    
 					a := &dns.A{rr_header, ip}
 					m.Answer = append(m.Answer, a)
 				}
-			case _IP6Query:
+			case dns.TypeAAAA:
 				rr_header := dns.RR_Header{
 					Name:   q.Name,
 					Rrtype: dns.TypeAAAA,
@@ -196,18 +205,18 @@ func (h *GODNSHandler) DoUDP(w dns.ResponseWriter, req *dns.Msg) {
 	h.do("udp", w, req)
 }
 
-func (h *GODNSHandler) isIPQuery(q dns.Question) int {
+func (h *GODNSHandler) isIPQuery(q dns.Question) uint16 {
 	if q.Qclass != dns.ClassINET {
-		return notIPQuery
+	    return dns.TypeNone
 	}
 
 	switch q.Qtype {
 	case dns.TypeA:
-		return _IP4Query
+	    return dns.TypeA
 	case dns.TypeAAAA:
-		return _IP6Query
+	    return dns.TypeAAAA
 	default:
-		return notIPQuery
+		return dns.TypeNone
 	}
 }
 

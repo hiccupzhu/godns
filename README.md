@@ -19,3 +19,10 @@
     cd src/godns
     go build -o godns
     ./godns -c godns.conf
+    
+    go run src/godns/*.go -c src/godns/godns.conf
+    
+    
+## 测试
+
+    dig @127.0.0.1 -p 1053 0.a.com

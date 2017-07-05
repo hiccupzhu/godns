@@ -11,6 +11,7 @@ import (
 
 	"github.com/hoisie/redis"
 	"golang.org/x/net/publicsuffix"
+	"github.com/miekg/dns"
 )
 
 type Hosts struct {
@@ -44,8 +45,8 @@ func NewHosts(hs HostsSettings, rs RedisSettings) Hosts {
 /*
 Match local /etc/hosts file first, remote redis records second
 */
-func (h *Hosts) Get(domain string, family int) ([]net.IP, bool) {
-
+func (h *Hosts) Get(domain string, family uint16) ([]net.IP, bool) {
+    
 	var sips []string
 	var ip net.IP
 	var ips []net.IP
@@ -63,9 +64,11 @@ func (h *Hosts) Get(domain string, family int) ([]net.IP, bool) {
 
 	for _, sip := range sips {
 		switch family {
-		case _IP4Query:
+//		case _IP4Query:
+		case dns.TypeA:
 			ip = net.ParseIP(sip).To4()
-		case _IP6Query:
+//		case _IP6Query:
+		case dns.TypeAAAA:
 			ip = net.ParseIP(sip).To16()
 		default:
 			continue
