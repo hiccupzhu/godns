@@ -1,18 +1,6 @@
-2017/07/05 17:06:33 [INFO] godns 0.1.2 start
-2017/07/05 17:06:33 [INFO] Start tcp listener on 0.0.0.0:1053
-2017/07/05 17:06:33 [INFO] Start udp listener on 0.0.0.0:1053
-2017/07/05 17:06:33 [DEBUG] update hosts records from /etc/hosts
-2017/07/05 17:06:34 [DEBUG] Update hosts records from redis
-2017/07/05 17:06:36 [INFO] 127.0.0.1 lookup　1.a.com IN A
-2017/07/05 17:06:36 [INFO] #### {Name:1.a.com. Qtype:1 Qclass:1}, IPQuery:1
-2017/07/05 17:06:36 [DEBUG] 1.a.com didn't found in hosts file
-2017/07/05 17:06:36 [DEBUG] 1.a.com IN A didn't hit cache
-2017/07/05 17:06:36 [WARN] 1.a.com. failed to get an valid answer on 114.114.114.114:53
-2017/07/05 17:06:38 [DEBUG] update hosts records from /etc/hosts
-2017/07/05 17:06:38 [DEBUG] Update hosts records from redis
-2017/07/05 17:06:43 [DEBUG] update hosts records from /etc/hosts
-2017/07/05 17:06:43 [DEBUG] Update hosts records from redis
-2017/07/05 17:06:48 [DEBUG] update hosts records from /etc/hosts
-2017/07/05 17:06:48 [DEBUG] Update hosts records from redis
-2017/07/05 17:06:53 [DEBUG] update hosts records from /etc/hosts
-2017/07/05 17:06:53 [DEBUG] Update hosts records from redis
+2017/07/07 18:13:01 [INFO] godns 0.1.2 start
+2017/07/07 18:13:01 [INFO] Start udp listener on 0.0.0.0:1053
+2017/07/07 18:13:01 [INFO] Start tcp listener on 0.0.0.0:1053
+2017/07/07 18:13:01 [DEBUG] update hosts records from /etc/hosts
+2017/07/07 18:13:01 [INFO] ========%!(EXTRA map[string]string=map[0.a.com:192.168.0.97,192.168.0.88 1.a.com:0.a.com])
+2017/07/07 18:13:01 [DEBUG] Update hosts records from redis

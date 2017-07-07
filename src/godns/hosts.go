@@ -55,6 +55,7 @@ func (h *Hosts) Get(domain string, family uint16) ([]net.IP, bool) {
 	if !ok {
 		if h.redisHosts != nil {
 			sips, ok = h.redisHosts.Get(domain)
+			logger.Info("##### ", sips)
 		}
 	}
 
@@ -64,15 +65,14 @@ func (h *Hosts) Get(domain string, family uint16) ([]net.IP, bool) {
 
 	for _, sip := range sips {
 		switch family {
-//		case _IP4Query:
 		case dns.TypeA:
 			ip = net.ParseIP(sip).To4()
-//		case _IP6Query:
 		case dns.TypeAAAA:
 			ip = net.ParseIP(sip).To16()
 		default:
 			continue
 		}
+		
 		if ip != nil {
 			ips = append(ips, ip)
 		}
@@ -110,9 +110,12 @@ func (r *RedisHosts) Get(domain string) ([]string, bool) {
 
 	domain = strings.ToLower(domain)
 	ip, ok := r.hosts[domain]
+	logger.Info("@@@ ", domain, ":", ip)
 	if ok {
 		return strings.Split(ip, ","), true
 	}
+	
+	logger.Info("@@@ ", ip)
 
 	sld, err := publicsuffix.EffectiveTLDPlusOne(domain)
 	if err != nil {
@@ -144,6 +147,7 @@ func (r *RedisHosts) Refresh() {
 	defer r.mu.Unlock()
 	r.clear()
 	err := r.redis.Hgetall(r.key, r.hosts)
+	logger.Info("========", r.hosts)
 	if err != nil {
 		logger.Warn("Update hosts records from redis failed %s", err)
 	} else {
