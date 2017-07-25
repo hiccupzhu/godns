@@ -147,7 +147,7 @@ func (r *RedisHosts) Refresh() {
 	defer r.mu.Unlock()
 	r.clear()
 	err := r.redis.Hgetall(r.key, r.hosts)
-	logger.Info("========", r.hosts)
+	logger.Info("========%v", r.hosts)
 	if err != nil {
 		logger.Warn("Update hosts records from redis failed %s", err)
 	} else {

@@ -108,26 +108,30 @@ func (h *GODNSHandler) do(Net string, w dns.ResponseWriter, req *dns.Msg) {
 
 			switch IPQuery {
 			case dns.TypeA:
-				
 				for _, ip := range ips {
 				    ip_s := ip.String()
-				    is_ip := net.ParseIP(ip_s) != nil
-				    logger.Info("#### %s isIP:%t", ip_s, is_ip)
-				    rrttype := dns.TypeNone
-				    if is_ip {
-				        rrttype = dns.TypeA
-				    } else {
-				        rrttype = dns.TypeCNAME
-				    }
+//				    is_ip := net.ParseIP(ip_s) != nil
+				    logger.Info("## %s  %s", ip_s, q.Name)
 				    
 				    rr_header := dns.RR_Header{
     					Name:   q.Name,
-    					Rrtype: rrttype,
+    					Rrtype: dns.TypeA,
     					Class:  dns.ClassINET,
     					Ttl:    settings.Hosts.TTL,
     				}
+				    a := &dns.A{rr_header, ip}
+				    ////////////////////////////////
+//				    rr_header := dns.RR_Header {
+//				        Name:	q.Name,
+//				        Rrtype:	dns.TypeA,
+//				        Class:	dns.ClassINET,
+//				        Ttl:    settings.Hosts.TTL,
+//				    }
+//				    a := &dns.CNAME{rr_header, "www.baidu.com"}
+				    ////////////////////////////////
 				    
-					a := &dns.A{rr_header, ip}
+				    
+					
 					m.Answer = append(m.Answer, a)
 				}
 			case dns.TypeAAAA:
