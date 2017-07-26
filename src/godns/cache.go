@@ -208,9 +208,10 @@ func (c *RedisCache) Remove() {
 
 }
 
-func KeyGen(q Question) string {
+func KeyGen(q dns.Question) string {
 	h := md5.New()
-	h.Write([]byte(q.String()))
+	qstr := fmt.Sprintf("%s %s %s", q.Name, dns.TypeToString[q.Qtype], dns.ClassToString[q.Qclass])
+	h.Write([]byte(qstr))
 	x := h.Sum(nil)
 	key := fmt.Sprintf("%x", x)
 	return key

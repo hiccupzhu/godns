@@ -8,15 +8,6 @@ import (
 )
 
 
-type Question struct {
-	qname  string
-	qtype  string
-	qclass string
-}
-
-func (q *Question) String() string {
-	return q.qname + " " + q.qclass + " " + q.qtype
-}
 
 type GODNSHandler struct {
 	resolver        *Resolver
@@ -85,8 +76,8 @@ func NewHandler() *GODNSHandler {
 }
 
 func (h *GODNSHandler) do(Net string, w dns.ResponseWriter, req *dns.Msg) {
-	q := req.Question[0]
-	Q := Question{UnFqdn(q.Name), dns.TypeToString[q.Qtype], dns.ClassToString[q.Qclass]}
+//	q := req.Question[0]
+//	Q := Question{UnFqdn(q.Name), dns.TypeToString[q.Qtype], dns.ClassToString[q.Qclass]}
 
 	var remote net.IP
 	if Net == "tcp" {
@@ -94,111 +85,18 @@ func (h *GODNSHandler) do(Net string, w dns.ResponseWriter, req *dns.Msg) {
 	} else {
 		remote = w.RemoteAddr().(*net.UDPAddr).IP
 	}
-	logger.Info("%s lookup　%s", remote, Q.String())
+	logger.Info("%s lookup　%s", remote, req.Question[0].Name)
 
     
-	IPQuery := h.isIPQuery(q)
-	logger.Info("#### %+v, IPQuery:%d", q, IPQuery)
+    m := new(dns.Msg)
+    m.SetReply(req)
+    err := h.Get(Net, m, req)
+    if err != nil {
+        dns.HandleFailed(w, req)
+    }
 
-	// Query hosts
-	if settings.Hosts.Enable && IPQuery > 0 {
-		if ips, ok := h.hosts.Get(Q.qname, IPQuery); ok {
-			m := new(dns.Msg)
-			m.SetReply(req)
+	w.WriteMsg(m)
 
-			switch IPQuery {
-			case dns.TypeA:
-				for _, ip := range ips {
-				    ip_s := ip.String()
-//				    is_ip := net.ParseIP(ip_s) != nil
-				    logger.Info("## %s  %s", ip_s, q.Name)
-				    
-				    rr_header := dns.RR_Header{
-    					Name:   q.Name,
-    					Rrtype: dns.TypeA,
-    					Class:  dns.ClassINET,
-    					Ttl:    settings.Hosts.TTL,
-    				}
-				    a := &dns.A{rr_header, ip}
-				    ////////////////////////////////
-//				    rr_header := dns.RR_Header {
-//				        Name:	q.Name,
-//				        Rrtype:	dns.TypeA,
-//				        Class:	dns.ClassINET,
-//				        Ttl:    settings.Hosts.TTL,
-//				    }
-//				    a := &dns.CNAME{rr_header, "www.baidu.com"}
-				    ////////////////////////////////
-				    
-				    
-					
-					m.Answer = append(m.Answer, a)
-				}
-			case dns.TypeAAAA:
-				rr_header := dns.RR_Header{
-					Name:   q.Name,
-					Rrtype: dns.TypeAAAA,
-					Class:  dns.ClassINET,
-					Ttl:    settings.Hosts.TTL,
-				}
-				for _, ip := range ips {
-					aaaa := &dns.AAAA{rr_header, ip}
-					m.Answer = append(m.Answer, aaaa)
-				}
-			}
-
-			w.WriteMsg(m)
-			logger.Debug("%s found in hosts file", Q.qname)
-			return
-		} else {
-			logger.Debug("%s didn't found in hosts file", Q.qname)
-		}
-	}
-
-	// Only query cache when qtype == 'A'|'AAAA' , qclass == 'IN'
-	key := KeyGen(Q)
-	if IPQuery > 0 {
-		mesg, err := h.cache.Get(key)
-		if err != nil {
-			if mesg, err = h.negCache.Get(key); err != nil {
-				logger.Debug("%s didn't hit cache", Q.String())
-			} else {
-				logger.Debug("%s hit negative cache", Q.String())
-				dns.HandleFailed(w, req)
-				return
-			}
-		} else {
-			logger.Debug("%s hit cache", Q.String())
-			// we need this copy against concurrent modification of Id
-			msg := *mesg
-			msg.Id = req.Id
-			w.WriteMsg(&msg)
-			return
-		}
-	}
-
-	mesg, err := h.resolver.Lookup(Net, req)
-
-	if err != nil {
-		logger.Warn("Resolve query error %s", err)
-		dns.HandleFailed(w, req)
-
-		// cache the failure, too!
-		if err = h.negCache.Set(key, nil); err != nil {
-			logger.Warn("Set %s negative cache failed: %v", Q.String(), err)
-		}
-		return
-	}
-
-	w.WriteMsg(mesg)
-
-	if IPQuery > 0 && len(mesg.Answer) > 0 {
-		err = h.cache.Set(key, mesg)
-		if err != nil {
-			logger.Warn("Set %s cache failed: %s", Q.String(), err.Error())
-		}
-		logger.Debug("Insert %s into cache", Q.String())
-	}
 }
 
 func (h *GODNSHandler) DoTCP(w dns.ResponseWriter, req *dns.Msg) {
@@ -224,6 +122,86 @@ func (h *GODNSHandler) isIPQuery(q dns.Question) uint16 {
 	}
 }
 
+
+
+func (h *GODNSHandler) Get(Net string, msg *dns.Msg, req *dns.Msg) (error) {
+    var records []string
+    var err error
+    
+    fqname := req.Question[0].Name
+    qname := UnFqdn(fqname)
+    
+    logger.Info("-------- Net:%s serch-domain:%s", Net, fqname)
+    
+    records, err = h.hosts.Get(qname)
+//    if err != nil {
+//        logger.Error(err.Error())
+//        return err
+//    }
+    
+    for _, record := range records {
+	    ip := net.ParseIP(record)
+	    frecord := dns.Fqdn(record)
+	    logger.Info("## %s %s", record, qname)
+	    
+	    if ip != nil {
+	        rr_header := dns.RR_Header {
+		        Name:	fqname,
+		        Rrtype:	dns.TypeA,
+		        Class:	dns.ClassINET,
+		        Ttl:    settings.Hosts.TTL,
+		    }
+		    rr := &dns.A{rr_header, ip}
+		    
+		    msg.Answer = append(msg.Answer, rr)
+		    
+		    return nil
+	    } else {
+	        ////////////////////////////////
+    	    rr_header := dns.RR_Header {
+    	        Name:	fqname,
+    	        Rrtype:	dns.TypeCNAME,
+    	        Class:	dns.ClassINET,
+    	        Ttl:    settings.Hosts.TTL,
+    	    }
+    	    rr := &dns.CNAME{rr_header, frecord}
+    	    
+    	    msg.Answer = append(msg.Answer, rr)
+    	    
+    	    nreq := new(dns.Msg)
+    	    nreq.Id = req.Id
+    	    Q := dns.Question{
+	            Name : rr.Target, 
+	            Qtype : dns.TypeA, 
+	            Qclass: dns.ClassINET,
+    	    }
+    	    
+    	    nreq.Question = append(nreq.Question, Q)
+    	    
+    	    h.Get(Net, msg, nreq)
+    	    return nil
+	    }
+	}
+    
+    logger.Info("++@@@  req:%+v\n \n", req)
+    msg2, err2 := h.resolver.Lookup(Net, req)
+    logger.Info("--@@@  req:%+v\n msg:%+v\n", req, msg2)
+	if err2 != nil {
+		logger.Warn("Resolve query error %s", err2.Error())
+
+		return err
+	}
+	
+	for _,a := range msg2.Answer {
+    	msg.Answer = append(msg.Answer, a)
+	}
+    
+    return nil
+}
+
+
+
+//cut like: baidu.com. -> baidu.com
 func UnFqdn(s string) string {
 	if dns.IsFqdn(s) {
 		return s[:len(s)-1]

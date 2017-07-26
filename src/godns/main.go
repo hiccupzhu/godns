@@ -13,8 +13,10 @@ var (
 )
 
 func main() {
-
 	initLogger()
+	
+	uid := os.Getuid()
+	logger.Info( "uid:%d",  uid)
 
 	server := &Server{
 		host:     settings.Server.Host,

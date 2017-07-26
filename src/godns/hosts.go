@@ -8,10 +8,11 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"errors"
 
 	"github.com/hoisie/redis"
 	"golang.org/x/net/publicsuffix"
-	"github.com/miekg/dns"
+//	"github.com/miekg/dns"
 )
 
 type Hosts struct {
@@ -45,40 +46,33 @@ func NewHosts(hs HostsSettings, rs RedisSettings) Hosts {
 /*
 Match local /etc/hosts file first, remote redis records second
 */
-func (h *Hosts) Get(domain string, family uint16) ([]net.IP, bool) {
+//func (h *Hosts) Get(domain string, family uint16) ([]net.IP, bool) {
+func (h *Hosts) Get(domain string) ([]string, error) {
     
-	var sips []string
-	var ip net.IP
-	var ips []net.IP
+//	var sips []string
+//	var ip net.IP
+//	var ips []net.IP
+	var res []string
 
-	sips, ok := h.fileHosts.Get(domain)
+	records, ok := h.fileHosts.Get(domain)
 	if !ok {
 		if h.redisHosts != nil {
-			sips, ok = h.redisHosts.Get(domain)
-			logger.Info("##### ", sips)
+			records, ok = h.redisHosts.Get(domain)
 		}
 	}
 
-	if sips == nil {
-		return nil, false
+	if records == nil {
+		return nil, errors.New("Not found any result.")
 	}
 
-	for _, sip := range sips {
-		switch family {
-		case dns.TypeA:
-			ip = net.ParseIP(sip).To4()
-		case dns.TypeAAAA:
-			ip = net.ParseIP(sip).To16()
-		default:
-			continue
-		}
+	for _, record := range records {
 		
-		if ip != nil {
-			ips = append(ips, ip)
+		if record != "" {
+			res = append(res, record)
 		}
 	}
 
-	return ips, (ips != nil)
+	return res, nil
 }
 
 /*
@@ -110,13 +104,10 @@ func (r *RedisHosts) Get(domain string) ([]string, bool) {
 
 	domain = strings.ToLower(domain)
 	ip, ok := r.hosts[domain]
-	logger.Info("@@@ ", domain, ":", ip)
 	if ok {
 		return strings.Split(ip, ","), true
 	}
 	
-	logger.Info("@@@ ", ip)
-
 	sld, err := publicsuffix.EffectiveTLDPlusOne(domain)
 	if err != nil {
 		return nil, false
