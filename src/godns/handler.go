@@ -16,6 +16,26 @@ type GODNSHandler struct {
 }
 
 func NewHandler() *GODNSHandler {
+    h := new(GODNSHandler)
+    h.hosts = NewHosts(settings.Hosts, settings.Redis)
+    
+    resolvConfig := settings.ResolvConfig
+	clientConfig, err := dns.ClientConfigFromFile(resolvConfig.ResolvFile)
+	if err != nil {
+		logger.Warn(":%s is not a valid resolv.conf file\n", resolvConfig.ResolvFile)
+		logger.Error(err.Error())
+		panic(err)
+	}
+	logger.Info("##### %+v \n", clientConfig)
+	clientConfig.Timeout = resolvConfig.Timeout
+	resolver := &Resolver{clientConfig}
+	
+	h.resolver = resolver
+    
+    return h
+}
+
+func NewHandler2() *GODNSHandler {
 
 	var (
 		clientConfig    *dns.ClientConfig
@@ -31,6 +51,7 @@ func NewHandler() *GODNSHandler {
 		logger.Error(err.Error())
 		panic(err)
 	}
+	logger.Info("##### %+v \n", clientConfig)
 	clientConfig.Timeout = resolvConfig.Timeout
 	resolver = &Resolver{clientConfig}
 
@@ -67,10 +88,15 @@ func NewHandler() *GODNSHandler {
 		panic("Invalid cache backend")
 	}
 
-	var hosts Hosts
-	if settings.Hosts.Enable {
-		hosts = NewHosts(settings.Hosts, settings.Redis)
-	}
+
+
+    var hosts Hosts
+    if ( true ) {
+    	if settings.Hosts.Enable {
+    		hosts = NewHosts(settings.Hosts, settings.Redis)
+    	}
+    	
+    }
 
 	return &GODNSHandler{resolver, cache, negCache, hosts}
 }
@@ -131,7 +157,7 @@ func (h *GODNSHandler) Get(Net string, msg *dns.Msg, req *dns.Msg) (error) {
     fqname := req.Question[0].Name
     qname := UnFqdn(fqname)
     
-    logger.Info("-------- Net:%s serch-domain:%s", Net, fqname)
+    logger.Info("-------- Net:%s serch-domain:%s qname:%s", Net, fqname, qname)
     
     records, err = h.hosts.Get(qname)
 //    if err != nil {

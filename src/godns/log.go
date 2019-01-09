@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 )
 
 const LOG_OUTPUT_BUFFER = 1024
@@ -75,10 +76,20 @@ func (l *GoDNSLogger) writeMesg(mesg string, level int) {
 	if l.level > level {
 		return
 	}
+	
+	//add filename and line-number
+	//runtime.Caller(calldepth)
+	_, file, line, ok := runtime.Caller(2)
+	if !ok {
+		file = "???"
+		line = 0
+	}
+	msg := fmt.Sprintf("%s:%d %s", file, line, mesg)
+	//end add filename and line-number
 
 	lm := &logMesg{
 		Level: level,
-		Mesg:  mesg,
+		Mesg:  msg,
 	}
 
 	l.mesgs <- lm

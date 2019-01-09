@@ -46,6 +46,7 @@ func (s *Server) Run() {
 
 }
 
+
 func (s *Server) start(ds *dns.Server) {
 
 	logger.Info("Start %s listener on %s", ds.Net, s.Addr())

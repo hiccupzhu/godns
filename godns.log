@@ -1,9 +1,63 @@
-2017/07/26 17:36:04 [INFO] uid:1000
-2017/07/26 17:36:04 [INFO] godns 0.1.2 start
-2017/07/26 17:36:04 [INFO] Start udp listener on 0.0.0.0:53
-2017/07/26 17:36:04 [INFO] Start tcp listener on 0.0.0.0:53
-2017/07/26 17:36:04 [ERROR] Start tcp listener on 0.0.0.0:53 failed:listen tcp 0.0.0.0:53: bind: permission denied
-2017/07/26 17:36:04 [ERROR] Start udp listener on 0.0.0.0:53 failed:listen udp 0.0.0.0:53: bind: permission denied
-2017/07/26 17:36:04 [DEBUG] update hosts records from /etc/hosts
-2017/07/26 17:36:04 [INFO] ========map[0.a.com:192.168.1.97 1.a.com:0.a.com 2.a.com:gz.monitor.ctzcdn.com 3.a.com:monitor.ctzcdn.com]
-2017/07/26 17:36:04 [DEBUG] Update hosts records from redis
+2019/01/09 19:36:33 /opt/code/godns/src/godns/main.go:19 [INFO] uid:1000
+2019/01/09 19:36:33 /opt/code/godns/src/godns/handler.go:29 [INFO] ##### &{Servers:[127.0.0.53] Search:[] Port:53 Ndots:1 Timeout:5 Attempts:2} 
+
+2019/01/09 19:36:33 /opt/code/godns/src/godns/main.go:30 [INFO] godns 0.1.2 start
+2019/01/09 19:36:33 /opt/code/godns/src/godns/server.go:52 [INFO] Start udp listener on 0.0.0.0:1053
+2019/01/09 19:36:33 /opt/code/godns/src/godns/server.go:52 [INFO] Start tcp listener on 0.0.0.0:1053
+2019/01/09 19:36:33 /opt/code/godns/src/godns/hosts.go:228 [DEBUG] update hosts records from /etc/hosts
+2019/01/09 19:36:33 /opt/code/godns/src/godns/hosts.go:141 [INFO] ========map[]
+2019/01/09 19:36:33 /opt/code/godns/src/godns/hosts.go:143 [WARN] Update hosts records from redis failed Redis Error: Key `godns:hosts` does not exist
+2019/01/09 19:36:37 /opt/code/godns/src/godns/handler.go:114 [INFO] 127.0.0.1 lookup　baidu.com.
+2019/01/09 19:36:37 /opt/code/godns/src/godns/handler.go:160 [INFO] -------- Net:udp serch-domain:baidu.com. qname:baidu.com
+2019/01/09 19:36:37 /opt/code/godns/src/godns/handler.go:212 [INFO] ++@@@  req:;; opcode: QUERY, status: NOERROR, id: 28308
+;; flags: rd ad; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1
+
+;; QUESTION SECTION:
+;baidu.com.	IN	 A
+
+;; ADDITIONAL SECTION:
+
+;; OPT PSEUDOSECTION:
+; EDNS: version 0; flags: ; udp: 4096
+; COOKIE: 48f1ec12a2405a70
+
+ 
+
+2019/01/09 19:36:37 /opt/code/godns/src/godns/resolver.go:63 [DEBUG] baidu.com resolv on 127.0.0.53:53 (udp) ttl: 2016198
+2019/01/09 19:36:37 /opt/code/godns/src/godns/handler.go:214 [INFO] --@@@  req:;; opcode: QUERY, status: NOERROR, id: 28308
+;; flags: rd ad; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1
+
+;; QUESTION SECTION:
+;baidu.com.	IN	 A
+
+;; ADDITIONAL SECTION:
+
+;; OPT PSEUDOSECTION:
+; EDNS: version 0; flags: ; udp: 4096
+; COOKIE: 48f1ec12a2405a70
+
+ msg:;; opcode: QUERY, status: NOERROR, id: 28308
+;; flags: qr rd ra; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1
+
+;; QUESTION SECTION:
+;baidu.com.	IN	 A
+
+;; ANSWER SECTION:
+baidu.com.	297	IN	A	123.125.115.110
+baidu.com.	297	IN	A	220.181.57.216
+
+;; ADDITIONAL SECTION:
+
+;; OPT PSEUDOSECTION:
+; EDNS: version 0; flags: ; udp: 65494
+
+
+2019/01/09 19:36:38 /opt/code/godns/src/godns/hosts.go:228 [DEBUG] update hosts records from /etc/hosts
+2019/01/09 19:36:38 /opt/code/godns/src/godns/hosts.go:141 [INFO] ========map[]
+2019/01/09 19:36:38 /opt/code/godns/src/godns/hosts.go:143 [WARN] Update hosts records from redis failed Redis Error: Key `godns:hosts` does not exist
+2019/01/09 19:36:43 /opt/code/godns/src/godns/hosts.go:228 [DEBUG] update hosts records from /etc/hosts
+2019/01/09 19:36:43 /opt/code/godns/src/godns/hosts.go:141 [INFO] ========map[]
+2019/01/09 19:36:43 /opt/code/godns/src/godns/hosts.go:143 [WARN] Update hosts records from redis failed Redis Error: Key `godns:hosts` does not exist
+2019/01/09 19:36:48 /opt/code/godns/src/godns/hosts.go:228 [DEBUG] update hosts records from /etc/hosts
+2019/01/09 19:36:48 /opt/code/godns/src/godns/hosts.go:141 [INFO] ========map[]
+2019/01/09 19:36:48 /opt/code/godns/src/godns/hosts.go:143 [WARN] Update hosts records from redis failed Redis Error: Key `godns:hosts` does not exist
